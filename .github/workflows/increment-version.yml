@@ -1,0 +1,36 @@
+name: Increment Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: true
+
+      - name: Bump version
+        run: |
+          VERSION_FILE="VERSION"
+          if [ -f "$VERSION_FILE" ]; then
+            version=$(cat "$VERSION_FILE")
+          else
+            version="0.0.0"
+          fi
+          IFS='.' read -r major minor patch <<< "$version"
+          patch=$((patch + 1))
+          new_version="$major.$minor.$patch"
+          echo "$new_version" > "$VERSION_FILE"
+          echo "Version bumped to $new_version"
+
+      - name: Commit and push updated VERSION
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add VERSION
+          git commit -m "Bump version to $(cat VERSION)" || echo "No changes to commit"
+          git push
