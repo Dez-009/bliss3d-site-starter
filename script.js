@@ -1,13 +1,35 @@
 
-// Smooth scroll and active nav effect
+// Smooth scroll
 document.querySelectorAll('.nav-btn').forEach(btn => {
-  btn.addEventListener('click', function(e) {
+  btn.addEventListener('click', e => {
     e.preventDefault();
-    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.querySelector(btn.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+    document
+      .querySelector(btn.getAttribute('href'))
+      .scrollIntoView({ behavior: 'smooth' });
   });
 });
+
+// Active nav highlighting based on scroll position
+const sections = document.querySelectorAll('section');
+const navButtons = document.querySelectorAll('.nav-btn');
+
+const observer = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navButtons.forEach(btn => {
+          const target = btn.getAttribute('href').substring(1);
+          btn.classList.toggle('active', target === entry.target.id);
+        });
+      }
+    });
+  },
+  {
+    threshold: 0.5,
+  }
+);
+
+sections.forEach(section => observer.observe(section));
 
 // Scroll-triggered animation
 const animated = document.querySelectorAll('.animate');
